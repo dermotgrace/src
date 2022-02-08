@@ -4,37 +4,34 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import org.wit.placemark.databinding.ActivityPlacemarkBinding
+import org.wit.placemark.main.MainApp
 import org.wit.placemark.models.PlacemarkModel
 import timber.log.Timber
 import timber.log.Timber.i
 
 class PlacemarkActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityPlacemarkBinding
-    val placemarks = ArrayList<PlacemarkModel>()
+    var placemark = PlacemarkModel()
+    var app : MainApp? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityPlacemarkBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Timber.plant(Timber.DebugTree())
-
+        app = application as MainApp
         i("Placemark Activity started...")
-
         binding.btnAdd.setOnClickListener() {
-            var placemark = PlacemarkModel()
             placemark.title = binding.placemarkTitle.text.toString()
             placemark.description = binding.placemarkDescription.text.toString()
-
-            if (placemark.title.isNotEmpty() && placemark.description.isNotEmpty()) {
-                i("add Button Pressed: $placemarks")
-                placemarks.add(placemark)
+            if (placemark.title.isNotEmpty()) {
+                app!!.placemarks.add(placemark.copy())
+                i("add Button Pressed: ${placemark}")
+                for (i in app!!.placemarks.indices)
+                { i("Placemark[$i]:${this.app!!.placemarks[i]}") }
             }
             else {
-                Snackbar
-                    .make(it,"Please fill all fields", Snackbar.LENGTH_LONG)
+                Snackbar.make(it,"Please Enter a title", Snackbar.LENGTH_LONG)
                     .show()
             }
         }
