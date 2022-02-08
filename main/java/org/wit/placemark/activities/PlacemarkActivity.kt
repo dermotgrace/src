@@ -29,6 +29,8 @@ class PlacemarkActivity : AppCompatActivity() {
                 i("add Button Pressed: ${placemark}")
                 for (i in app!!.placemarks.indices)
                 { i("Placemark[$i]:${this.app!!.placemarks[i]}") }
+                setResult(RESULT_OK)
+                finish()
             }
             else {
                 Snackbar.make(it,"Please Enter a title", Snackbar.LENGTH_LONG)
