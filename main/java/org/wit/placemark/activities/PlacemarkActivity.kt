@@ -30,19 +30,27 @@ class PlacemarkActivity : AppCompatActivity() {
             placemark = intent.extras?.getParcelable("placemark_edit")!!
             binding.placemarkTitle.setText(placemark.title)
             binding.placemarkDescription.setText(placemark.description)
+            binding.btnAdd.setText(getString(R.string.button_savePlacemark))
+        } else {
+            binding.btnAdd.setText(getString(R.string.button_addPlacemark))
         }
+
 
         i("Placemark Activity started...")
         binding.btnAdd.setOnClickListener() {
             placemark.title = binding.placemarkTitle.text.toString()
             placemark.description = binding.placemarkDescription.text.toString()
             if (placemark.title.isNotEmpty()) {
-                app!!.placemarks.create(placemark.copy())
+                if (!intent.hasExtra("placemark_edit")) {
+                    app!!.placemarks.create(placemark.copy())
+                } else {
+                    app!!.placemarks.update(placemark)
+                }
                 setResult(RESULT_OK)
                 finish()
             }
             else {
-                Snackbar.make(it,"Please Enter a title", Snackbar.LENGTH_LONG)
+                Snackbar.make(it,getString(R.string.placemark_EnterTitle), Snackbar.LENGTH_LONG)
                     .show()
             }
         }
