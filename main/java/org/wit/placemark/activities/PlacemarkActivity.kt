@@ -1,18 +1,23 @@
 package org.wit.placemark.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
 import org.wit.placemark.R
 import org.wit.placemark.databinding.ActivityPlacemarkBinding
+import org.wit.placemark.helpers.showImagePicker
 import org.wit.placemark.main.MainApp
 import org.wit.placemark.models.PlacemarkModel
 import timber.log.Timber.i
 
 class PlacemarkActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlacemarkBinding
+    private lateinit var imageIntentLauncher : ActivityResultLauncher<Intent>
     var placemark = PlacemarkModel()
     var app : MainApp? = null
 
@@ -44,7 +49,7 @@ class PlacemarkActivity : AppCompatActivity() {
                 if (!intent.hasExtra("placemark_edit")) {
                     app!!.placemarks.create(placemark.copy())
                 } else {
-                    app!!.placemarks.update(placemark)
+                    app!!.placemarks.update(placemark.copy())
                 }
                 setResult(RESULT_OK)
                 finish()
@@ -53,6 +58,14 @@ class PlacemarkActivity : AppCompatActivity() {
                 Snackbar.make(it,getString(R.string.placemark_EnterTitle), Snackbar.LENGTH_LONG)
                     .show()
             }
+        }
+
+        binding.chooseImage.setOnClickListener {
+            i("Select image")
+        }
+
+        binding.chooseImage.setOnClickListener {
+            showImagePicker(imageIntentLauncher)
         }
     }
 
@@ -67,5 +80,20 @@ class PlacemarkActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun registerImagePickerCallback() {
+        imageIntentLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+            { result ->
+                when(result.resultCode){
+                    RESULT_OK -> {
+                        if (result.data != null) {
+                            i("Got Result ${result.data!!.data}")
+                        } // end of if
+                    }
+                    RESULT_CANCELED -> { } else -> { }
+                }
+            }
     }
 }
