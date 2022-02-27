@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
 import org.wit.placemark.R
 import org.wit.placemark.databinding.ActivityPlacemarkBinding
 import org.wit.placemark.helpers.showImagePicker
@@ -19,7 +20,7 @@ class PlacemarkActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlacemarkBinding
     private lateinit var imageIntentLauncher : ActivityResultLauncher<Intent>
     var placemark = PlacemarkModel()
-    var app : MainApp? = null
+    lateinit var app: MainApp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +36,11 @@ class PlacemarkActivity : AppCompatActivity() {
             placemark = intent.extras?.getParcelable("placemark_edit")!!
             binding.placemarkTitle.setText(placemark.title)
             binding.placemarkDescription.setText(placemark.description)
+            binding.chooseImage.setText(getString(R.string.button_changeImage))
             binding.btnAdd.setText(getString(R.string.button_savePlacemark))
+            Picasso.get()
+                .load(placemark.image)
+                .into(binding.placemarkImage)
         } else {
             binding.btnAdd.setText(getString(R.string.button_addPlacemark))
         }
@@ -61,12 +66,11 @@ class PlacemarkActivity : AppCompatActivity() {
         }
 
         binding.chooseImage.setOnClickListener {
-            i("Select image")
+            showImagePicker(imageIntentLauncher)
+            binding.chooseImage.setText(getString(R.string.button_changeImage))
         }
 
-        binding.chooseImage.setOnClickListener {
-            showImagePicker(imageIntentLauncher)
-        }
+        registerImagePickerCallback()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -83,6 +87,7 @@ class PlacemarkActivity : AppCompatActivity() {
     }
 
     private fun registerImagePickerCallback() {
+        i("image: registerImagePickerCallback")
         imageIntentLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult())
             { result ->
@@ -90,6 +95,10 @@ class PlacemarkActivity : AppCompatActivity() {
                     RESULT_OK -> {
                         if (result.data != null) {
                             i("Got Result ${result.data!!.data}")
+                            placemark.image = result.data!!.data!!
+                            Picasso.get()
+                                .load(placemark.image)
+                                .into(binding.placemarkImage)
                         } // end of if
                     }
                     RESULT_CANCELED -> { } else -> { }

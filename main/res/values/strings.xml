@@ -8,5 +8,6 @@
     <string name="menu_CancelPlacemark">Cancel</string>
     <string name="placemark_EnterTitle">Please Enter a Title</string>
     <string name="button_addImage">Add Image</string>
+    <string name="button_changeImage">Change Image</string>
     <string name="select_placemark_image">Select placemark image</string>
 </resources>
