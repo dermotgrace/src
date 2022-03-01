@@ -9,5 +9,6 @@
     <string name="placemark_EnterTitle">Please Enter a Title</string>
     <string name="button_addImage">Add Image</string>
     <string name="button_changeImage">Change Image</string>
-    <string name="select_placemark_image">Select placemark image</string>
+    <string name="select_placemark_image">Select Placemark Image</string>
+    <string name="change_placemark_image">Change Placemark Imaage</string>
 </resources>
