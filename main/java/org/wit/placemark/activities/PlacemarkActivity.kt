@@ -69,8 +69,7 @@ class PlacemarkActivity : AppCompatActivity() {
         }
 
         binding.chooseImage.setOnClickListener {
-            showImagePicker(imageIntentLauncher)
-            binding.chooseImage.setText(getString(R.string.button_changeImage))
+            showImagePicker(imageIntentLauncher,this)
         }
 
         binding.placemarkLocation.setOnClickListener {
@@ -98,12 +97,15 @@ class PlacemarkActivity : AppCompatActivity() {
             R.id.item_cancel -> {
                 finish()
             }
+            R.id.item_delete -> {
+                app.placemarks.delete(placemark)
+                finish()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
     private fun registerImagePickerCallback() {
-        i("image: registerImagePickerCallback")
         imageIntentLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult())
             { result ->
@@ -111,10 +113,16 @@ class PlacemarkActivity : AppCompatActivity() {
                     RESULT_OK -> {
                         if (result.data != null) {
                             i("Got Result ${result.data!!.data}")
-                            placemark.image = result.data!!.data!!
+
+                            val image = result.data!!.data!!
+                            contentResolver.takePersistableUriPermission(image,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            placemark.image = image
+
                             Picasso.get()
                                 .load(placemark.image)
                                 .into(binding.placemarkImage)
+                            binding.chooseImage.setText(R.string.change_placemark_image)
                         } // end of if
                     }
                     RESULT_CANCELED -> { } else -> { }
