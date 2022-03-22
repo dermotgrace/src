@@ -17,7 +17,9 @@ import org.wit.placemark.R
 import org.wit.placemark.databinding.ActivityMapBinding
 import timber.log.Timber.i
 import org.wit.placemark.models.Location
-class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener{
+class MapActivity : AppCompatActivity(), OnMapReadyCallback,
+                                            GoogleMap.OnMarkerDragListener,
+                                            GoogleMap.OnMarkerClickListener {
 
     private lateinit var map: GoogleMap
     var location = Location()
@@ -46,6 +48,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerD
         map.addMarker(options)
         map.setOnMarkerDragListener(this)
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, location.zoom))
+        map.setOnMarkerClickListener(this)
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        val loc = LatLng(location.lat, location.lng)
+        marker.snippet = "GPS : $loc"
+        return false
     }
 
     override fun onMarkerDragStart(p0: Marker?) {
