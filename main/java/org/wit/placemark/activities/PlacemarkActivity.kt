@@ -13,6 +13,7 @@ import org.wit.placemark.R
 import org.wit.placemark.databinding.ActivityPlacemarkBinding
 import org.wit.placemark.helpers.showImagePicker
 import org.wit.placemark.main.MainApp
+import org.wit.placemark.models.Location
 import org.wit.placemark.models.PlacemarkModel
 import timber.log.Timber.i
 
@@ -20,6 +21,7 @@ class PlacemarkActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlacemarkBinding
     private lateinit var imageIntentLauncher : ActivityResultLauncher<Intent>
     private lateinit var mapIntentLauncher : ActivityResultLauncher<Intent>
+    var location = Location(52.245696, -7.139102, 15f)
 
     var placemark = PlacemarkModel()
     lateinit var app: MainApp
@@ -73,9 +75,12 @@ class PlacemarkActivity : AppCompatActivity() {
         }
 
         binding.placemarkLocation.setOnClickListener {
+            i("Map clicked")
             val launcherIntent = Intent(this, MapActivity::class.java)
-
+                .putExtra("location", location)
+            i("lancherIntent created")
             mapIntentLauncher.launch(launcherIntent)
+            i("After map launch")
         }
 
         registerImagePickerCallback()
@@ -116,8 +121,20 @@ class PlacemarkActivity : AppCompatActivity() {
     }
 
     private fun registerMapCallback() {
+        i("Register map callback")
         mapIntentLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult())
-            { i("Map Loaded") }
+            { result ->
+                when (result.resultCode) {
+                    RESULT_OK -> {
+                        if (result.data != null) {
+                            i("Got Location ${result.data.toString()}")
+                            location = result.data!!.extras?.getParcelable("location")!!
+                            i("Location == $location")
+                        } // end of if
+                    }
+                    RESULT_CANCELED -> { } else -> { }
+                }
+            }
     }
 }
